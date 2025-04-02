@@ -33,6 +33,7 @@
             padding: 25px;
             background: #f8f9fa;
             min-width: 500px;
+            position: relative;
         }
 
         .username-box {
@@ -46,31 +47,6 @@
             border-radius: 10px;
             font-size: 16px;
             box-sizing: border-box;
-        }
-
-        .emoji-menu {
-            display: none;
-            position: absolute;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 10px;
-            margin-top: 5px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            z-index: 100;
-        }
-
-        .emoji-btn {
-            cursor: pointer;
-            font-size: 24px;
-            background: none;
-            border: none;
-            padding: 5px;
-            transition: transform 0.2s;
-        }
-
-        .emoji-btn:hover {
-            transform: scale(1.2);
         }
 
         .message-input {
@@ -123,7 +99,6 @@
             border-radius: 12px;
             max-width: 80%;
             word-break: break-word;
-            animation: fadeIn 0.3s ease-in;
         }
 
         .message span {
@@ -134,41 +109,27 @@
             font-size: 0.9em;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .clear-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+            position: absolute;
+            right: 30px;
+            top: 20px;
         }
 
-        /* Estilo para la hora del mensaje */
-        .message time {
-            font-size: 0.75em;
-            color: #65676b;
-            display: block;
-            margin-top: 8px;
-        }
-
-        /* Barra de desplazamiento personalizada */
-        .chat-history::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .chat-history::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-
-        .chat-history::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 4px;
-        }
-
-        .chat-history::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
+        .clear-btn:hover {
+            background: #bb2d3b;
         }
     </style>
 </head>
 <body>
-    <!-- Resto del HTML se mantiene igual como en la versión anterior -->
     <div class="chat-container">
         <div class="left-panel">
             <div class="username-box">
@@ -176,27 +137,19 @@
             </div>
             
             <div class="message-input">
-                <button class="emoji-btn" onclick="toggleEmojiMenu()">😀</button>
-                <div class="emoji-menu" id="emojiMenu">
-                    <button class="emoji-btn" onclick="insertEmoji('😀')">😀</button>
-                    <button class="emoji-btn" onclick="insertEmoji('😊')">😊</button>
-                    <button class="emoji-btn" onclick="insertEmoji('❤️')">❤️</button>
-                    <button class="emoji-btn" onclick="insertEmoji('👍')">👍</button>
-                </div>
                 <textarea id="message" placeholder="Escribe tu mensaje..."></textarea>
                 <button class="send-btn" onclick="sendMessage()">Enviar</button>
             </div>
         </div>
 
         <div class="right-panel">
-            <div class="chat-history" id="chatHistory">
-                <!-- Mensajes aparecerán aquí -->
-            </div>
+            <button class="clear-btn" onclick="clearHistory()">Limpiar Historial</button>
+            <div class="chat-history" id="chatHistory"></div>
         </div>
     </div>
 
     <script>
-        // El mismo JavaScript de la versión anterior corregido
+        // Cargar mensajes al iniciar
         document.addEventListener('DOMContentLoaded', () => {
             loadMessages();
         });
@@ -212,7 +165,9 @@
                 messageDiv.innerHTML = `
                     <span>${escapeHTML(msg.username)}</span>
                     ${escapeHTML(msg.content)}
-                    <time>${new Date(msg.timestamp).toLocaleTimeString()}</time>
+                    <div style="font-size: 0.8em; color: #666; margin-top: 5px;">
+                        ${new Date(msg.timestamp).toLocaleTimeString()}
+                    </div>
                 `;
                 chatHistory.appendChild(messageDiv);
             });
@@ -259,17 +214,14 @@
             document.getElementById('message').value = '';
         }
 
-        function toggleEmojiMenu() {
-            const menu = document.getElementById('emojiMenu');
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        function clearHistory() {
+            if (confirm('¿Estás seguro de querer borrar todo el historial?')) {
+                localStorage.removeItem('chatMessages');
+                loadMessages();
+            }
         }
 
-        function insertEmoji(emoji) {
-            const messageInput = document.getElementById('message');
-            messageInput.value += emoji;
-            messageInput.focus();
-        }
-
+        // Enviar con Enter
         document.getElementById('message').addEventListener('keypress', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
