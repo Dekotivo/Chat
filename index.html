@@ -1,1 +1,194 @@
-Esto es una prueba
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Interactivo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        .chat-container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .left-panel {
+            flex: 1;
+            padding: 20px;
+            border-right: 2px solid #e4e6eb;
+        }
+
+        .right-panel {
+            flex: 2;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 0 15px 15px 0;
+        }
+
+        .username-box {
+            margin-bottom: 20px;
+        }
+
+        #username {
+            padding: 10px;
+            width: calc(100% - 24px);
+            border: 2px solid #e4e6eb;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .emoji-menu {
+            display: none;
+            position: absolute;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .emoji-btn {
+            cursor: pointer;
+            font-size: 24px;
+            background: none;
+            border: none;
+            padding: 5px;
+        }
+
+        .message-input {
+            position: relative;
+            margin-top: 20px;
+        }
+
+        #message {
+            width: calc(100% - 24px);
+            height: 100px;
+            padding: 10px;
+            border: 2px solid #e4e6eb;
+            border-radius: 8px;
+            resize: vertical;
+            font-size: 16px;
+        }
+
+        .send-btn {
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-top: 10px;
+            cursor: pointer;
+            float: right;
+        }
+
+        .chat-history {
+            height: 500px;
+            overflow-y: auto;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .message {
+            background: #e4e6eb;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .message span {
+            display: block;
+            font-weight: bold;
+            color: #1877f2;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="left-panel">
+            <div class="username-box">
+                <input type="text" id="username" placeholder="Ingresa tu nombre">
+            </div>
+            
+            <div class="message-input">
+                <button class="emoji-btn" onclick="toggleEmojiMenu()">😀</button>
+                <div class="emoji-menu" id="emojiMenu">
+                    <button class="emoji-btn" onclick="insertEmoji('😀')">😀</button>
+                    <button class="emoji-btn" onclick="insertEmoji('😊')">😊</button>
+                    <button class="emoji-btn" onclick="insertEmoji('❤️')">❤️</button>
+                    <button class="emoji-btn" onclick="insertEmoji('👍')">👍</button>
+                </div>
+                <textarea id="message" placeholder="Escribe tu mensaje..."></textarea>
+                <button class="send-btn" onclick="sendMessage()">Enviar</button>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="chat-history" id="chatHistory">
+                <!-- Mensajes aparecerán aquí -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleEmojiMenu() {
+            const menu = document.getElementById('emojiMenu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function insertEmoji(emoji) {
+            const messageInput = document.getElementById('message');
+            messageInput.value += emoji;
+        }
+
+        function sendMessage() {
+            const username = document.getElementById('username').value;
+            const message = document.getElementById('message').value;
+            
+            if (!username) {
+                alert('Por favor ingresa tu nombre');
+                return;
+            }
+
+            if (!message) {
+                alert('Por favor escribe un mensaje');
+                return;
+            }
+
+            const chatHistory = document.getElementById('chatHistory');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.innerHTML = `
+                <span>${username}</span>
+                ${message}
+                <div style="font-size: 0.8em; color: #666; margin-top: 5px;">
+                    ${new Date().toLocaleTimeString()}
+                </div>
+            `;
+
+            chatHistory.appendChild(messageDiv);
+            document.getElementById('message').value = '';
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        // Enviar mensaje con Enter (Shift+Enter para nueva línea)
+        document.getElementById('message').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
