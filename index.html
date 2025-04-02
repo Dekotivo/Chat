@@ -172,7 +172,7 @@
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <h1>Dekotivo Chat</h1>
+            <h1>Chat en Tiempo Real</h1>
         </div>
         
         <div class="chat-messages" id="messages-container"></div>
@@ -192,42 +192,47 @@
     </div>
 
     <script>
-        // Configuración de Firebase (debes reemplazar con tus propios datos)
+        // Configuración de Firebase (Reemplazar con tus datos)
         const firebaseConfig = {
-            apiKey: "AIzaSyCg_dbwSFkxot2PNqJ2ADea4XD3NYEbOsY",
-            authDomain: "chat-706f4.firebaseapp.com",
-            projectId: "chat-706f4",
-            storageBucket: "chat-706f4.firebasestorage.app",
-            messagingSenderId: "828802108649",
-            appId: "1:828802108649:web:797273f50f845398963478"
+            apiKey: "AIzaSyCkoQr_NAFe7GYkC8UtiMNrND3YsZuZqwM",
+            authDomain: "dekotivo-chat.firebaseapp.com",
+            projectId: "dekotivo-chat",
+            storageBucket: "dekotivo-chat.firebasestorage.app",
+            messagingSenderId: "451755468777",
+            appId: "1:451755468777:web:8d5530173c4886d8364d78"
         };
 
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-
-        // Referencia a la colección de mensajes
         const messagesRef = db.collection('messages');
+
+        // Función para insertar emojis
+        function insertEmoji(emoji) {
+            const input = document.getElementById('message-input');
+            input.value += emoji;
+            input.focus();
+        }
 
         // Función para enviar mensajes
         function sendMessage() {
             const username = document.getElementById('username').value || 'Anónimo';
-            const emoji = document.getElementById('emoji-select').value;
-            const text = document.getElementById('message-input').value;
+            const text = document.getElementById('message-input').value.trim();
             
-            if (text.trim()) {
+            if (text) {
                 messagesRef.add({
                     username,
-                    emoji,
                     text,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    document.getElementById('message-input').value = '';
+                }).catch(error => {
+                    console.error('Error enviando mensaje:', error);
                 });
-                
-                document.getElementById('message-input').value = '';
             }
         }
 
-        // Recibir mensajes en tiempo real
+        // Escuchar nuevos mensajes en tiempo real
         messagesRef
             .orderBy('timestamp')
             .onSnapshot(snapshot => {
@@ -240,7 +245,7 @@
                     messageDiv.className = 'message';
                     messageDiv.innerHTML = `
                         <span>${msg.username} • ${msg.timestamp?.toDate().toLocaleTimeString()}</span>
-                        ${msg.emoji} ${msg.text}
+                        ${msg.text}
                     `;
                     container.appendChild(messageDiv);
                 });
@@ -250,7 +255,8 @@
 
         // Enviar con Enter
         document.getElementById('message-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
                 sendMessage();
             }
         });
